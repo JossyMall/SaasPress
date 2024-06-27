@@ -3,8 +3,8 @@
  * Plugin Name: SaaSPress
  * Plugin URI: https://tabs101.com
  * Description: A multi-tenant WordPress plugin for SaaS applications.
- * Version: 1.0.0
- * Author: Angel Cee
+ * Version: 1.0
+ * Author: Your Name
  * Author URI: https://tabs101.com
  * License: GPL2
  */
@@ -17,6 +17,9 @@ if (!defined('ABSPATH')) {
 require_once plugin_dir_path(__FILE__) . 'includes/class-tenant-manager.php';
 require_once plugin_dir_path(__FILE__) . 'includes/class-saaspress.php';
 require_once plugin_dir_path(__FILE__) . 'admin/class-saaspress-settings.php';
+require_once plugin_dir_path(__FILE__) . 'admin/class-saaspress-tenants.php';
+require_once plugin_dir_path(__FILE__) . 'admin/class-saaspress-about.php';
+require_once plugin_dir_path(__FILE__) . 'admin/class-saaspress-configurations.php';
 
 function saaspress_init() {
     $tenant_manager = new TenantManager();
@@ -40,6 +43,5 @@ function saaspress_init() {
 add_action('plugins_loaded', 'saaspress_init');
 
 // Register settings page
-add_action('admin_menu', 'saaspress_register_settings_page');
-add_action('admin_init', 'saaspress_register_settings');
+add_action('admin_menu', 'saaspress_register_admin_pages');
 ?>
