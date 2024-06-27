@@ -62,7 +62,7 @@ function saaspress_config_page() {
         echo '<label><input type="checkbox" name="tables[]" value="' . esc_attr($table) . '"> ' . esc_html($table) . '</label><br>';
     }
     echo '</div>';
-    echo '<p><input type="submit" name="make_tenant" class="button button-primary" value="Make Tenant"></"></p>';
+    echo '<p><input type="submit" name="make_tenant" class="button button-primary" value="Make Tenant"></p>';
     echo '</form></div>';
 }
 ?>
