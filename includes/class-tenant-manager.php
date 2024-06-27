@@ -1,37 +1,25 @@
 <?php
 class TenantManager {
-    public function make_tenant($user_id, $tables, $db_host, $db_name, $db_user, $db_pass) {
+    public static function create_tenant($user_id, $tables, $db_details) {
         global $wpdb;
+        
+        // Ensure tenant DB details are saved
+        update_user_meta($user_id, 'tenant_db', $db_details);
 
-        // Generate a unique prefix for the tenant
-        $tenant_prefix = 'tenant_' . $user_id . '_' . wp_generate_password(6, false);
-
-        // Update user meta
-        update_user_meta($user_id, 'is_tenant', true);
-        update_user_meta($user_id, 'tenant_tables', implode(',', $tables));
-        update_user_meta($user_id, 'tenant_prefix', $tenant_prefix);
-
-        // Duplicate tables
-        $tenant_db = new wpdb($db_user, $db_pass, $db_name, $db_host);
+        // Duplicate selected tables for the tenant
         foreach ($tables as $table) {
-            $new_table = $tenant_prefix . '_' . $table;
-            $tenant_db->query("CREATE TABLE $new_table LIKE $table");
-            $tenant_db->query("INSERT $new_table SELECT * FROM $table");
+            $tenant_table = self::get_tenant_table_name($user_id, $table, $db_details);
+            $wpdb->query("CREATE TABLE $tenant_table LIKE $table");
+            $wpdb->query("INSERT INTO $tenant_table SELECT * FROM $table");
         }
+
+        // Save tenant meta
+        update_user_meta($user_id, 'is_tenant', '1');
+        update_user_meta($user_id, 'tenant_tables', implode(', ', $tables));
     }
 
-    public function apply_filters($global_filters) {
-        global $wpdb;
-
-        foreach ($global_filters as $table) {
-            $tenant_prefix = get_user_meta(get_current_user_id(), 'tenant_prefix', true);
-            if ($tenant_prefix) {
-                add_filter($table, function($original_table) use ($tenant_prefix, $table) {
-                    global $wpdb;
-                    return $tenant_prefix . '_' . $table;
-                });
-            }
-        }
+    private static function get_tenant_table_name($user_id, $table, $db_details) {
+        return $db_details['prefix'] . $user_id . '_' . $table;
     }
 }
 ?>
