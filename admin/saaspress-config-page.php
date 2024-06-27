@@ -50,16 +50,15 @@ function saaspress_config_page() {
 
     echo '<h2>Make Tenants</h2>';
     echo '<form method="post" action="">';
-    echo '<select name="non_tenant_user" id="non_tenant_user">';
-    echo '<option value="">Select a user</option>';
-    $non_tenants = get_users(array('meta_key' => 'is_tenant', 'meta_value' => '0'));
-    foreach ($non_tenants as $non_tenant) {
-        echo '<option value="' . esc_attr($non_tenant->ID) . '">' . esc_html($non_tenant->display_name) . '</option>';
+    echo '<div style="overflow-y: scroll; height: 200px; border: 1px solid #ccc; padding: 10px;">';
+    $users = get_users(array('meta_key' => 'is_tenant', 'meta_value' => '0'));
+    foreach ($users as $user) {
+        echo '<div><input type="radio" name="non_tenant_user" value="' . esc_attr($user->ID) . '"> ' . esc_html($user->display_name) . '</div>';
     }
-    echo '</select>';
+    echo '</div>';
     echo '<div id="db_tables">';
-    foreach ($wpdb->tables() as $table) {
-        echo '<label><input type="checkbox" name="tables[]" value="' . esc_attr($table) . '"> ' . esc_html($table) . '</label><br>';
+    foreach ($wpdb->get_results("SHOW TABLES", ARRAY_N) as $table) {
+        echo '<label><input type="checkbox" name="tables[]" value="' . esc_attr($table[0]) . '"> ' . esc_html($table[0]) . '</label><br>';
     }
     echo '</div>';
     echo '<p><input type="submit" name="make_tenant" class="button button-primary" value="Make Tenant"></p>';
