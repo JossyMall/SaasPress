@@ -3,7 +3,7 @@
 Plugin Name: SaaSPress
 Description: Multi-tenant WordPress plugin with deep role management and content isolation.
 Version: 1.1
-Author: Your Name
+Author: Angel Cee
 Author URI: https://tabs101.com
 */
 
