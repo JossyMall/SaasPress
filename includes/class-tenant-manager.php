@@ -14,49 +14,34 @@ class TenantManager {
         $tenant_id = 'tenant_' . $user_id;
         $tenant_prefix = $tenant_id . '_';
 
-        $this->tenants[$tenant_id] = [
-            'prefix' => $tenant_prefix,
-            'content' => [],
-            'plugins' => [],
-            'roles' => [],
-            'settings' => [],
-        ];
+        $this->tenants[$user_id] = $tenant_prefix;
+        update_user_meta($user_id, 'is_tenant', true);
+        update_user_meta($user_id, 'tenant_prefix', $tenant_prefix);
 
-        // Create tenant tables
-        $this->create_tenant_tables($tenant_prefix);
-
-        return $tenant_id;
+        // Add any additional initialization for the tenant here
     }
 
-    public function get_tenant_prefix($user_id) {
-        $tenant_id = 'tenant_' . $user_id;
-        return isset($this->tenants[$tenant_id]) ? $this->tenants[$tenant_id]['prefix'] : $this->default_prefix;
-    }
-
-    private function create_tenant_tables($prefix) {
+    public function duplicate_table_for_tenant($user_id, $table) {
         global $wpdb;
-        $tables = [
-            'posts',
-            'postmeta',
-            'terms',
-            'term_taxonomy',
-            'term_relationships',
-            'options',
-        ];
+        $tenant_prefix = get_user_meta($user_id, 'tenant_prefix', true);
+        $tenant_table = $tenant_prefix . $table;
 
-        foreach ($tables as $table) {
-            $wpdb->query("CREATE TABLE IF NOT EXISTS {$prefix}{$table} LIKE {$this->default_prefix}{$table}");
-        }
+        $wpdb->query("CREATE TABLE $tenant_table LIKE $table");
+        $wpdb->query("INSERT $tenant_table SELECT * FROM $table");
     }
 
     public function switch_to_tenant($user_id) {
         global $wpdb;
-        $wpdb->prefix = $this->get_tenant_prefix($user_id);
+        $tenant_prefix = get_user_meta($user_id, 'tenant_prefix', true);
+
+        if ($tenant_prefix) {
+            $wpdb->set_prefix($tenant_prefix);
+        }
     }
 
     public function switch_to_default() {
         global $wpdb;
-        $wpdb->prefix = $this->default_prefix;
+        $wpdb->set_prefix($this->default_prefix);
     }
 }
 ?>
