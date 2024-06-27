@@ -1,47 +1,37 @@
 <?php
-
 class TenantManager {
-    private $tenants;
-    private $default_prefix;
-
-    public function __construct() {
+    public function make_tenant($user_id, $tables, $db_host, $db_name, $db_user, $db_pass) {
         global $wpdb;
-        $this->tenants = [];
-        $this->default_prefix = $wpdb->prefix;
-    }
 
-    public function create_tenant($user_id) {
-        $tenant_id = 'tenant_' . $user_id;
-        $tenant_prefix = $tenant_id . '_';
+        // Generate a unique prefix for the tenant
+        $tenant_prefix = 'tenant_' . $user_id . '_' . wp_generate_password(6, false);
 
-        $this->tenants[$user_id] = $tenant_prefix;
+        // Update user meta
         update_user_meta($user_id, 'is_tenant', true);
+        update_user_meta($user_id, 'tenant_tables', implode(',', $tables));
         update_user_meta($user_id, 'tenant_prefix', $tenant_prefix);
 
-        // Add any additional initialization for the tenant here
-    }
-
-    public function duplicate_table_for_tenant($user_id, $table) {
-        global $wpdb;
-        $tenant_prefix = get_user_meta($user_id, 'tenant_prefix', true);
-        $tenant_table = $tenant_prefix . $table;
-
-        $wpdb->query("CREATE TABLE $tenant_table LIKE $table");
-        $wpdb->query("INSERT $tenant_table SELECT * FROM $table");
-    }
-
-    public function switch_to_tenant($user_id) {
-        global $wpdb;
-        $tenant_prefix = get_user_meta($user_id, 'tenant_prefix', true);
-
-        if ($tenant_prefix) {
-            $wpdb->set_prefix($tenant_prefix);
+        // Duplicate tables
+        $tenant_db = new wpdb($db_user, $db_pass, $db_name, $db_host);
+        foreach ($tables as $table) {
+            $new_table = $tenant_prefix . '_' . $table;
+            $tenant_db->query("CREATE TABLE $new_table LIKE $table");
+            $tenant_db->query("INSERT $new_table SELECT * FROM $table");
         }
     }
 
-    public function switch_to_default() {
+    public function apply_filters($global_filters) {
         global $wpdb;
-        $wpdb->set_prefix($this->default_prefix);
+
+        foreach ($global_filters as $table) {
+            $tenant_prefix = get_user_meta(get_current_user_id(), 'tenant_prefix', true);
+            if ($tenant_prefix) {
+                add_filter($table, function($original_table) use ($tenant_prefix, $table) {
+                    global $wpdb;
+                    return $tenant_prefix . '_' . $table;
+                });
+            }
+        }
     }
 }
 ?>
