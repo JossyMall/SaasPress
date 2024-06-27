@@ -94,17 +94,23 @@ function saaspress_config_page() {
     echo '<h2>Make Tenants</h2>';
     echo '<form method="post" action="">';
     echo '<div style="overflow-y: scroll; height: 200px; border: 1px solid #ccc; padding: 10px;">';
-    
+
     $users = get_users(array(
         'meta_query' => array(
+            'relation' => 'OR',
             array(
-                'key'     => 'is_tenant',
+                'key' => 'is_tenant',
                 'compare' => 'NOT EXISTS',
             ),
             array(
-                'key'     => 'is_tenant',
-                'compare' => '!=',
-                'value'   => '1',
+                'key' => 'is_tenant',
+                'value' => '0',
+                'compare' => 'LIKE'
+            ),
+            array(
+                'key' => 'is_tenant',
+                'value' => 'false',
+                'compare' => 'LIKE'
             )
         )
     ));
