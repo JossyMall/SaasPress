@@ -16,6 +16,23 @@ function saaspress_config_page() {
         }
     }
 
+    if (isset($_POST['save_settings'])) {
+        $db_host = sanitize_text_field($_POST['db_host']);
+        $db_name = sanitize_text_field($_POST['db_name']);
+        $db_user = sanitize_text_field($_POST['db_user']);
+        $db_pass = sanitize_text_field($_POST['db_pass']);
+        $db_details = array(
+            'host' => $db_host,
+            'name' => $db_name,
+            'user' => $db_user,
+            'pass' => $db_pass
+        );
+        update_option('saaspress_db_details', $db_details);
+
+        $tenants_per_db = intval($_POST['tenants_per_db']);
+        update_option('saaspress_tenants_per_db', $tenants_per_db);
+    }
+
     echo '<div class="wrap"><h1>Configurations</h1>';
     if (isset($connection_message)) {
         echo '<p>' . esc_html($connection_message) . '</p>';
@@ -30,6 +47,10 @@ function saaspress_config_page() {
     echo '<tr><th scope="row"><label for="db_pass">Database Password</label></th><td><input name="db_pass" type="password" id="db_pass" value="" class="regular-text"></td></tr>';
     echo '</table>';
     echo '<p><input type="submit" name="test_db_connection" class="button button-primary" value="Test Database Connection"></p>';
+
+    echo '<h2>Tenants per Database</h2>';
+    echo '<input type="number" name="tenants_per_db" value="' . esc_attr(get_option('saaspress_tenants_per_db', 1)) . '">';
+    echo '<p><input type="submit" name="save_settings" class="button button-primary" value="Save Settings"></p>';
     echo '</form>';
 
     echo '<h2>Tenant DB</h2>';
@@ -42,7 +63,7 @@ function saaspress_config_page() {
         echo '<tr>';
         echo '<td>' . esc_html($tenant->display_name) . '</td>';
         echo '<td>' . esc_html($tenant->ID) . '</td>';
-        echo '<td>' . esc_html($tenant_db) . '</td>';
+        echo '<td>' . esc_html(json_encode($tenant_db)) . '</td>';
         echo '</tr>';
     }
     echo '</tbody>';
@@ -51,11 +72,17 @@ function saaspress_config_page() {
     echo '<h2>Make Tenants</h2>';
     echo '<form method="post" action="">';
     echo '<div style="overflow-y: scroll; height: 200px; border: 1px solid #ccc; padding: 10px;">';
+    
     $users = get_users(array('meta_key' => 'is_tenant', 'meta_value' => '0'));
-    foreach ($users as $user) {
-        echo '<div><input type="radio" name="non_tenant_user" value="' . esc_attr($user->ID) . '"> ' . esc_html($user->display_name) . '</div>';
+    if (empty($users)) {
+        echo '<p>No non-tenant users found.</p>';
+    } else {
+        foreach ($users as $user) {
+            echo '<div><input type="radio" name="non_tenant_user" value="' . esc_attr($user->ID) . '"> ' . esc_html($user->display_name) . '</div>';
+        }
     }
     echo '</div>';
+    
     echo '<div id="db_tables">';
     foreach ($wpdb->get_results("SHOW TABLES", ARRAY_N) as $table) {
         echo '<label><input type="checkbox" name="tables[]" value="' . esc_attr($table[0]) . '"> ' . esc_html($table[0]) . '</label><br>';
