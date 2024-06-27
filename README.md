@@ -7,9 +7,14 @@ This software works by creating user specific tables for each user that signup o
 you have a Saas platform where each tenant has a completely unique dashboard on the same wordpress installation.
 The tables (Plugins) that you want to make unique for each of your tenant can be configured from the plugin settings.
 Essentially we are simulating the same wordpress installation but different database for each of your users (Tenants)
+
+
 SaaSPress Plugin Changelog
+
 Version 1.1
+
 Date: 2024-06-26
+
 
 New Features:
 
