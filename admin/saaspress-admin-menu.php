@@ -12,6 +12,7 @@ function saaspress_about_page() {
     echo '<div class="wrap"><h1>About SaaSPress</h1><p>This plugin allows for a multi-tenant setup within WordPress, providing unique content and isolated environments for each user.</p></div>';
 }
 
-require_once plugin_dir_path( __FILE__ ) . 'saaspress-tenants-page.php';
-require_once plugin_dir_path( __FILE__ ) . 'saaspress-config-page.php';
-require_once plugin_dir_path( __FILE__ ) . 'saaspress-global-filters.php';
+require_once plugin_dir_path(__FILE__) . 'saaspress-tenants-page.php';
+require_once plugin_dir_path(__FILE__) . 'saaspress-config-page.php';
+require_once plugin_dir_path(__FILE__) . 'saaspress-global-filters.php';
+?>
