@@ -1,47 +1,30 @@
 <?php
-/**
- * Plugin Name: SaaSPress
- * Plugin URI: https://tabs101.com
- * Description: A multi-tenant WordPress plugin for SaaS applications.
- * Version: 1.1
- * Author: Angel Cee
- * Author URI: https://tabs101.com
- * License: GPL2
- */
+/*
+Plugin Name: SaaSPress
+Description: Multi-tenant WordPress plugin with deep role management and content isolation.
+Version: 1.1
+Author: Your Name
+Author URI: https://tabs101.com
+*/
 
-if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly.
 }
 
-// Include necessary files
-require_once plugin_dir_path(__FILE__) . 'includes/class-tenant-manager.php';
-require_once plugin_dir_path(__FILE__) . 'includes/class-saaspress.php';
-require_once plugin_dir_path(__FILE__) . 'admin/class-saaspress-settings.php';
-require_once plugin_dir_path(__FILE__) . 'admin/class-saaspress-tenants.php';
-require_once plugin_dir_path(__FILE__) . 'admin/class-saaspress-about.php';
-require_once plugin_dir_path(__FILE__) . 'admin/class-saaspress-configurations.php';
+// Includes
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-tenant-manager.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-saaspress.php';
 
-function saaspress_init() {
-    $tenant_manager = new TenantManager();
-    $saaspress = new SaasPress($tenant_manager);
-
-    // Initialize tenant environment on user login
-    add_action('wp_login', function($user_login, $user) use ($tenant_manager) {
-        $tenant_manager->switch_to_tenant($user->ID);
-    }, 10, 2);
-
-    // Switch to default environment on user logout
-    add_action('wp_logout', function() use ($tenant_manager) {
-        $tenant_manager->switch_to_default();
-    });
-
-    // Create tenant environment on user registration
-    add_action('user_register', function($user_id) use ($tenant_manager) {
-        $tenant_manager->create_tenant($user_id);
-    });
+// Enqueue admin styles and scripts
+function saaspress_enqueue_admin_assets() {
+    wp_enqueue_style( 'saaspress-admin-styles', plugin_dir_url( __FILE__ ) . 'assets/css/admin-styles.css' );
+    wp_enqueue_script( 'saaspress-admin-scripts', plugin_dir_url( __FILE__ ) . 'assets/js/admin-scripts.js', array('jquery'), null, true );
 }
-add_action('plugins_loaded', 'saaspress_init');
+add_action( 'admin_enqueue_scripts', 'saaspress_enqueue_admin_assets' );
 
-// Register settings page
-add_action('admin_menu', 'saaspress_register_admin_pages');
-?>
+// Register admin menus and pages
+require_once plugin_dir_path( __FILE__ ) . 'admin/saaspress-admin-menu.php';
+
+// Initialize the main plugin class
+$tenant_manager = new TenantManager();
+$saaspress = new SaaasPress($tenant_manager);
