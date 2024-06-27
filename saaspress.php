@@ -3,7 +3,7 @@
  * Plugin Name: SaaSPress
  * Plugin URI: https://tabs101.com
  * Description: A multi-tenant WordPress plugin for SaaS applications.
- * Version: 1.0
+ * Version: 1.1
  * Author: Your Name
  * Author URI: https://tabs101.com
  * License: GPL2
