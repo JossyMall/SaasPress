@@ -22,11 +22,11 @@ function saaspress_global_filters_page() {
     echo '<table class="wp-list-table widefat fixed striped">';
     echo '<thead><tr><th>Table</th><th>Apply Filter</th></tr></thead>';
     echo '<tbody>';
-    foreach ($wpdb->tables() as $table) {
-        $checked = in_array($table, $global_filters) ? 'checked' : '';
+    foreach ($wpdb->get_results("SHOW TABLES", ARRAY_N) as $table) {
+        $checked = in_array($table[0], $global_filters) ? 'checked' : '';
         echo '<tr>';
-        echo '<td>' . esc_html($table) . '</td>';
-        echo '<td><input type="checkbox" name="global_filters[]" value="' . esc_attr($table) . '" ' . $checked . '></td>';
+        echo '<td>' . esc_html($table[0]) . '</td>';
+        echo '<td><input type="checkbox" name="global_filters[]" value="' . esc_attr($table[0]) . '" ' . $checked . '></td>';
         echo '</tr>';
     }
     echo '</tbody>';
