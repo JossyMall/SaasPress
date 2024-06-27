@@ -1,25 +1,23 @@
 <?php
-
-class SaasPress {
+class SaaasPress {
     private $tenant_manager;
 
     public function __construct($tenant_manager) {
         $this->tenant_manager = $tenant_manager;
 
-        $this->add_dynamic_filters();
+        add_action('init', [$this, 'apply_global_filters']);
+        add_action('user_register', [$this, 'make_new_user_tenant']);
     }
 
-    private function add_dynamic_filters() {
-        $tables = get_option('saaspress_tables');
-        if ($tables) {
-            $tables = array_map('trim', explode("\n", $tables));
-            foreach ($tables as $table) {
-                add_filter("{$table}_table", function($table) {
-                    global $wpdb;
-                    return $wpdb->prefix . $table;
-                });
-            }
-        }
+    public function apply_global_filters() {
+        $global_filters = get_option('saaspress_global_filters', array());
+        $this->tenant_manager->apply_filters($global_filters);
+    }
+
+    public function make_new_user_tenant($user_id) {
+        $global_filters = get_option('saaspress_global_filters', array());
+        $db_details = get_option('saaspress_default_db_details', array());
+        $this->tenant_manager->make_tenant($user_id, $global_filters, $db_details['db_host'], $db_details['db_name'], $db_details['db_user'], $db_details['db_pass']);
     }
 }
 ?>
