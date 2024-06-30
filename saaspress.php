@@ -1,18 +1,21 @@
 <?php
-/*
-Plugin Name: SaaSPress
-Plugin URI: http://example.com/saaspress
-Description: A plugin for multi-tenant setup within WordPress.
-Version: 1.0.0
-Author: Angel Cee
-Author URI: http://example.com
-License: GPL2
-*/
+/**
+ * Plugin Name: SaaSPress
+ * Description: A plugin to create a multi-tenant setup within WordPress, allowing for isolated environments per user.
+ * Version: 1.0.0
+ * Author: Angel Cee
+ */
 
-// Include core files
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 require_once plugin_dir_path(__FILE__) . 'includes/class-saaspress.php';
-require_once plugin_dir_path(__FILE__) . 'includes/class-tenant-manager.php';
+require_once plugin_dir_path(__FILE__) . 'includes/class-saaspress-tenant-manager.php';
 
-// Initialize the plugin
-SaaSPress::init();
-?>
+function saaspress_init() {
+    $tenant_manager = new SaasPress_Tenant_Manager();
+    $saaspress = new SaasPress($tenant_manager);
+}
+
+add_action('plugins_loaded', 'saaspress_init');
