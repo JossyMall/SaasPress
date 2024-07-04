@@ -11,7 +11,7 @@ Essentially we are simulating the same wordpress installation but different data
 
 SaaSPress Plugin Changelog
 
-Version 1.1
+##Version 1.0 (Initital release)
 
 Date: 2024-06-26
 
