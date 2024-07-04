@@ -42,6 +42,8 @@ Initial Release:
 Basic multi-tenant setup with unique content and independent plugin instances for each user.
 Strict role management to ensure content isolation.
 
+## VERSION 1.1 UPDATE IS GOING TO BE PUBLISHED TO THIS REPOSITORY IN BITS FROM TODAY 3/7/2024 - 11/7/2024
+
 # SaasPress - Multi-Tenant WordPress Plugin
 
 SaasPress is a powerful WordPress plugin designed to provide a multi-tenant setup where each user has their own isolated environment within the same WordPress installation. This includes unique content, independent plugin instances, and strict role management. Essentially, it's like running WordPress as a SaaS (Software as a Service) platform with deep role management and content isolation.
