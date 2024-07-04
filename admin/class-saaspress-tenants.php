@@ -1,33 +1,76 @@
-<div class="wrap">
-    <h1>Tenants</h1>
-    <table class="widefat fixed" cellspacing="0">
-        <thead>
-            <tr>
-                <th class="manage-column column-columnname">User</th>
-                <th class="manage-column column-columnname">User ID</th>
-                <th class="manage-column column-columnname">Is Tenant</th>
-                <th class="manage-column column-columnname">Email</th>
-                <th class="manage-column column-columnname">Tenant Tables</th>
-                <th class="manage-column column-columnname">Tenant Database</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $users = get_users();
-            foreach ($users as $user) {
-                $is_tenant = get_user_meta($user->ID, 'is_tenant', true);
-                $tenant_prefix = get_user_meta($user->ID, 'tenant_prefix', true);
-                $tenant_db = $this->tenant_manager->get_tenant_db_details($user->ID);
-                ?>
-                <tr>
-                    <td><?php echo $user->display_name; ?></td>
-                    <td><?php echo $user->ID; ?></td>
-                    <td><?php echo $is_tenant ? '<span style="color:green;">Yes</span>' : '<span style="color:red;">No</span>'; ?></td>
-                    <td><?php echo $user->user_email; ?></td>
-                    <td><?php echo $tenant_prefix ? str_replace($wpdb->prefix, '', $tenant_prefix) : ''; ?></td>
-                    <td><?php echo $tenant_db; ?></td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-</div>
+<?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly.
+}
+
+class SaasPress_Tenants {
+
+    public function __construct() {
+        add_action( 'admin_menu', array( $this, 'add_menu_page' ) );
+    }
+
+    public function add_menu_page() {
+        add_submenu_page(
+            'saaspress',
+            'Tenants',
+            'Tenants',
+            'manage_options',
+            'saaspress-tenants',
+            array( $this, 'display_tenants_page' )
+        );
+    }
+
+    public function display_tenants_page() {
+        ?>
+        <div class="wrap">
+            <h1>Tenants</h1>
+            <table class="wp-list-table widefat fixed striped">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>User ID</th>
+                        <th>Is Tenant</th>
+                        <th>Email</th>
+                        <th>Tenant Tables</th>
+                        <th>Tenant Database Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $users = get_users();
+                    foreach ( $users as $user ) {
+                        $is_tenant = get_user_meta( $user->ID, 'is_tenant', true ) == '1';
+                        $tenant_prefix = get_user_meta( $user->ID, 'tenant_prefix', true );
+                        $tenant_db = get_user_meta( $user->ID, 'tenant_db_name', true );
+
+                        $tables = $is_tenant ? implode( ', ', $this->get_tenant_tables( $tenant_prefix ) ) : '';
+                        ?>
+                        <tr>
+                            <td><?php echo esc_html( $user->display_name ); ?></td>
+                            <td><?php echo esc_html( $user->ID ); ?></td>
+                            <td style="color: <?php echo $is_tenant ? 'green' : 'red'; ?>;">
+                                <?php echo $is_tenant ? 'Yes' : 'No'; ?>
+                            </td>
+                            <td><?php echo esc_html( $user->user_email ); ?></td>
+                            <td><?php echo esc_html( $tables ); ?></td>
+                            <td><?php echo esc_html( $tenant_db ); ?></td>
+                        </tr>
+                        <?php
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+        <?php
+    }
+
+    private function get_tenant_tables( $prefix ) {
+        global $wpdb;
+        return $wpdb->get_col( "SHOW TABLES LIKE '{$prefix}%'" );
+    }
+}
+
+if ( is_admin() ) {
+    new SaasPress_Tenants();
+}
