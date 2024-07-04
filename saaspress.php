@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SaasPress
  * Description: A multi-tenant management plugin for WordPress.
- * Version: 1.0.0
+ * Version: 0.1.0
  * Author: Angel Cee
  * Text Domain: saaspress
  * Domain Path: /languages
