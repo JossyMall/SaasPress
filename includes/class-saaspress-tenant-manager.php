@@ -1,42 +1,48 @@
 <?php
 class SaasPress_Tenant_Manager {
-    public function create_tenant($user_id, $tables) {
-        global $wpdb;
+    public function is_tenant($user_id) {
+        return get_user_meta($user_id, 'is_tenant', true) === 'yes';
+    }
 
-        $tenant_prefix = $this->generate_tenant_prefix();
-        update_user_meta($user_id, 'saaspress_tenant_prefix', $tenant_prefix);
+    public function get_tenant_prefix($user_id) {
+        return get_user_meta($user_id, 'tenant_prefix', true);
+    }
+
+    public function get_global_filtered_tables() {
+        return get_option('saaspress_global_filters', []);
+    }
+
+    public function add_tenant($user_id, $tables) {
+        if ($this->is_tenant($user_id)) {
+            return;
+        }
+
+        global $wpdb;
+        $tenant_prefix = 'tenant_' . wp_generate_password(8, false, false) . '_';
+        update_user_meta($user_id, 'is_tenant', 'yes');
+        update_user_meta($user_id, 'tenant_prefix', $tenant_prefix);
 
         $databases = get_option('saaspress_databases', []);
         $tenant_limit_per_db = get_option('saaspress_tenant_limit_per_db', 10);
-        $tenant_db = $this->get_tenant_db($databases, $tenant_limit_per_db);
 
-        update_user_meta($user_id, 'saaspress_tenant_db', $tenant_db);
+        foreach ($databases as $database) {
+            $db_info = explode(':', $database);
+            $db_name = $db_info[0];
+            $db_user = $db_info[1];
+            $db_password = $db_info[2];
+            $db_host = isset($db_info[3]) ? $db_info[3] : 'localhost';
 
-        foreach ($tables as $table) {
-            $new_table_name = $tenant_prefix . $table;
-            $create_table_sql = "CREATE TABLE $tenant_db.$new_table_name LIKE $wpdb->prefix$table";
-            $wpdb->query($create_table_sql);
-        }
-    }
-
-    private function generate_tenant_prefix() {
-        return substr(md5(uniqid(rand(), true)), 0, 8) . '_';
-    }
-
-    private function get_tenant_db($databases, $tenant_limit_per_db) {
-        foreach ($databases as $db) {
-            $tenant_count = $this->get_tenant_count_in_db($db);
+            $tenant_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $wpdb->users WHERE meta_key = 'tenant_db_name' AND meta_value = %s", $db_name));
             if ($tenant_count < $tenant_limit_per_db) {
-                return $db;
+                update_user_meta($user_id, 'tenant_db_name', $db_name);
+                break;
             }
         }
-        return $databases[0];
-    }
 
-    private function get_tenant_count_in_db($db) {
-        global $wpdb;
-        $count_query = $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->usermeta} WHERE meta_key = 'saaspress_tenant_db' AND meta_value = %s", $db);
-        return $wpdb->get_var($count_query);
+        $tenant_db_name = get_user_meta($user_id, 'tenant_db_name', true);
+
+        foreach ($tables as $table) {
+            $wpdb->query("CREATE TABLE $tenant_db_name.$tenant_prefix$table LIKE $wpdb->prefix$table");
+        }
     }
 }
-
