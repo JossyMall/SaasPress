@@ -1,4 +1,4 @@
-# SaasPress
+# SaasPress Beta (0.1)
 Full-featured multi-tenancy for wordpress, turn any wordpress installation and plugin into a Saas product
 This software is still in the early phase of development. Your contributions will be appreciated.
 We do not have a community for this software yet but you can request for features and custom development/support by writing me on whatsapp/telegram +79644165577
@@ -11,7 +11,7 @@ Essentially we are simulating the same wordpress installation but different data
 
 SaaSPress Plugin Changelog
 
-##Version 1.0 (Initital release)
+## Version 0.1 (Initital release)
 
 Date: 2024-06-26
 
@@ -34,7 +34,7 @@ Bug Fixes:
 
 Initial release of tenant management system, ensuring isolated environments for each user within the same WordPress installation.
 Previous Versions
-Version 1.0
+Version 0.1
 Date: 2024-06-24
 
 Initial Release:
@@ -42,13 +42,13 @@ Initial Release:
 Basic multi-tenant setup with unique content and independent plugin instances for each user.
 Strict role management to ensure content isolation.
 
-## VERSION 1.1 UPDATE IS GOING TO BE PUBLISHED TO THIS REPOSITORY IN BITS FROM TODAY 3/7/2024 - 11/7/2024
+## VERSION 0.2 UPDATE IS GOING TO BE PUBLISHED TO THIS REPOSITORY IN BITS FROM TODAY 3/7/2024 - 11/7/2024
 
 # SaasPress - Multi-Tenant WordPress Plugin
 
 SaasPress is a powerful WordPress plugin designed to provide a multi-tenant setup where each user has their own isolated environment within the same WordPress installation. This includes unique content, independent plugin instances, and strict role management. Essentially, it's like running WordPress as a SaaS (Software as a Service) platform with deep role management and content isolation.
 
-## Features (version 1.1 Update)
+## Features (version 0.2 Update)
 
 1. **Multi-Tenant Database Architecture:** Supports multi-tenant architecture by isolating tenant data in separate database tables.
 2. **Dynamic Database Connections:** Can dynamically switch between multiple databases based on tenant configuration.
