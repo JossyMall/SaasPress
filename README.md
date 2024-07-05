@@ -112,5 +112,6 @@ SaasPress is developed and maintained by Angel Cee.
 
 ## Support
 
-For support or any questions, please open an issue in this repository or contact us via email at support@saaspress.com.
+For support or any questions, please open an issue in this repository or contact us via email at support@tabs101.com or livejossymall@gmail.com
+## +79644165577 (whatsapp/telegram)
 
