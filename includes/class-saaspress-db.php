@@ -1,21 +1,21 @@
 <?php
 class SaasPress_DB {
-    private $wpdb;
+    public function duplicate_tables($prefix, $tables) {
+        global $wpdb;
 
-    public function __construct($wpdb) {
-        $this->wpdb = $wpdb;
-    }
+        foreach ($tables as $table) {
+            $table_name = $wpdb->prefix . $table;
+            $new_table_name = $prefix . $table;
 
-    public function execute($query) {
-        return $this->wpdb->query($query);
-    }
+            // Get the table structure
+            $create_table_sql = $wpdb->get_row("SHOW CREATE TABLE $table_name", ARRAY_N)[1];
 
-    public function get_results($query) {
-        return $this->wpdb->get_results($query);
-    }
+            // Modify the table name in the SQL
+            $create_table_sql = str_replace("CREATE TABLE `$table_name`", "CREATE TABLE `$new_table_name`", $create_table_sql);
 
-    public function get_var($query) {
-        return $this->wpdb->get_var($query);
+            // Create the new table
+            $wpdb->query($create_table_sql);
+        }
     }
 }
-
+?>
