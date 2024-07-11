@@ -1,76 +1,57 @@
 <?php
-
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly.
-}
-
 class SaasPress_Tenants {
-
     public function __construct() {
-        add_action( 'admin_menu', array( $this, 'add_menu_page' ) );
+        add_action('admin_menu', array($this, 'register_tenants_page'));
     }
 
-    public function add_menu_page() {
+    public function register_tenants_page() {
         add_submenu_page(
             'saaspress',
             'Tenants',
             'Tenants',
             'manage_options',
             'saaspress-tenants',
-            array( $this, 'display_tenants_page' )
+            array($this, 'display_tenants_page')
         );
     }
 
     public function display_tenants_page() {
-        ?>
-        <div class="wrap">
-            <h1>Tenants</h1>
-            <table class="wp-list-table widefat fixed striped">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>User ID</th>
-                        <th>Is Tenant</th>
-                        <th>Email</th>
-                        <th>Tenant Tables</th>
-                        <th>Tenant Database Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $users = get_users();
-                    foreach ( $users as $user ) {
-                        $is_tenant = get_user_meta( $user->ID, 'is_tenant', true ) == '1';
-                        $tenant_prefix = get_user_meta( $user->ID, 'tenant_prefix', true );
-                        $tenant_db = get_user_meta( $user->ID, 'tenant_db_name', true );
+        $users = get_users();
+        $user_ids = wp_list_pluck($users, 'ID');
+        $user_meta = $this->get_user_meta_multi($user_ids);
 
-                        $tables = $is_tenant ? implode( ', ', $this->get_tenant_tables( $tenant_prefix ) ) : '';
-                        ?>
-                        <tr>
-                            <td><?php echo esc_html( $user->display_name ); ?></td>
-                            <td><?php echo esc_html( $user->ID ); ?></td>
-                            <td style="color: <?php echo $is_tenant ? 'green' : 'red'; ?>;">
-                                <?php echo $is_tenant ? 'Yes' : 'No'; ?>
-                            </td>
-                            <td><?php echo esc_html( $user->user_email ); ?></td>
-                            <td><?php echo esc_html( $tables ); ?></td>
-                            <td><?php echo esc_html( $tenant_db ); ?></td>
-                        </tr>
-                        <?php
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
-        <?php
+        echo '<div class="wrap">';
+        echo '<h1>Tenants</h1>';
+        echo '<table class="wp-list-table widefat fixed striped">';
+        echo '<thead><tr><th>User</th><th>Is Tenant</th><th>Tenant Prefix</th><th>Tenant Database</th></tr></thead>';
+        echo '<tbody>';
+
+        foreach ($users as $user) {
+            $is_tenant = isset($user_meta[$user->ID]['is_tenant']) && $user_meta[$user->ID]['is_tenant'] == '1';
+            $tenant_prefix = isset($user_meta[$user->ID]['tenant_prefix']) ? $user_meta[$user->ID]['tenant_prefix'] : '';
+            $tenant_db = isset($user_meta[$user->ID]['tenant_db_name']) ? $user_meta[$user->ID]['tenant_db_name'] : '';
+
+            echo '<tr>';
+            echo '<td>' . esc_html($user->display_name) . '</td>';
+            echo '<td>' . ($is_tenant ? 'Yes' : 'No') . '</td>';
+            echo '<td>' . esc_html($tenant_prefix) . '</td>';
+            echo '<td>' . esc_html($tenant_db) . '</td>';
+            echo '</tr>';
+        }
+
+        echo '</tbody></table>';
+        echo '</div>';
     }
 
-    private function get_tenant_tables( $prefix ) {
+    private function get_user_meta_multi($user_ids) {
         global $wpdb;
-        return $wpdb->get_col( "SHOW TABLES LIKE '{$prefix}%'" );
+        $user_ids = implode(',', array_map('intval', $user_ids));
+        $meta = $wpdb->get_results("SELECT user_id, meta_key, meta_value FROM {$wpdb->usermeta} WHERE user_id IN ($user_ids)", ARRAY_A);
+        $result = array();
+        foreach ($meta as $m) {
+            $result[$m['user_id']][$m['meta_key']] = $m['meta_value'];
+        }
+        return $result;
     }
 }
-
-if ( is_admin() ) {
-    new SaasPress_Tenants();
-}
+?>
