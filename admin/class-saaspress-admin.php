@@ -1,76 +1,76 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly.
+if (!defined('ABSPATH')) {
+    exit;
 }
 
 class SaasPress_Admin {
-
-    public function __construct() {
-        add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
-        add_action( 'admin_init', array( $this, 'register_settings' ) );
+    public static function init() {
+        add_action('admin_menu', [__CLASS__, 'admin_menu']);
+        add_action('admin_enqueue_scripts', [__CLASS__, 'enqueue_scripts']);
     }
 
-    public function add_admin_menu() {
+    public static function admin_menu() {
         add_menu_page(
-            'SaasPress',
-            'SaasPress',
+            __('SaasPress', 'saaspress'),
+            __('SaasPress', 'saaspress'),
             'manage_options',
             'saaspress',
-            array( $this, 'create_settings_page' ),
-            '',
-            110
+            [__CLASS__, 'render_settings_page']
         );
 
         add_submenu_page(
             'saaspress',
-            'About SaasPress',
-            'About Us',
-            'manage_options',
-            'saaspress-about',
-            array( $this, 'create_about_page' )
-        );
-
-        add_submenu_page(
-            'saaspress',
-            'Tenants',
-            'Tenants',
-            'manage_options',
-            'saaspress-tenants',
-            array( $this, 'create_tenants_page' )
-        );
-
-        add_submenu_page(
-            'saaspress',
-            'Configurations',
-            'Configurations',
+            __('Configurations', 'saaspress'),
+            __('Configurations', 'saaspress'),
             'manage_options',
             'saaspress-configurations',
-            array( $this, 'create_configurations_page' )
+            [__CLASS__, 'render_configurations_page']
+        );
+
+        add_submenu_page(
+            'saaspress',
+            __('Tenants', 'saaspress'),
+            __('Tenants', 'saaspress'),
+            'manage_options',
+            'saaspress-tenants',
+            [__CLASS__, 'render_tenants_page']
+        );
+
+        add_submenu_page(
+            'saaspress',
+            __('About Us', 'saaspress'),
+            __('About Us', 'saaspress'),
+            'manage_options',
+            'saaspress-about',
+            [__CLASS__, 'render_about_page']
         );
     }
 
-    public function register_settings() {
-        register_setting( 'saaspress-settings-group', 'saaspress_global_filters' );
-        register_setting( 'saaspress-settings-group', 'saaspress_databases' );
-        register_setting( 'saaspress-settings-group', 'saaspress_tenant_limit_per_db' );
+    public static function enqueue_scripts($hook) {
+        if (strpos($hook, 'saaspress') !== false) {
+            wp_enqueue_style('saaspress-admin', SAASPRESS_PLUGIN_URL . 'admin/saaspress-admin.css', [], SAASPRESS_VERSION);
+            wp_enqueue_script('saaspress-admin', SAASPRESS_PLUGIN_URL . 'admin/saaspress-admin.js', ['jquery'], SAASPRESS_VERSION, true);
+        }
     }
 
-    public function create_settings_page() {
-        include_once plugin_dir_path( __FILE__ ) . 'class-saaspress-settings.php';
+    public static function render_settings_page() {
+        require_once SAASPRESS_PLUGIN_DIR . 'admin/class-saaspress-settings.php';
+        SaasPress_Settings::render_page();
     }
 
-    public function create_about_page() {
-        include_once plugin_dir_path( __FILE__ ) . 'class-saaspress-about.php';
+    public static function render_configurations_page() {
+        require_once SAASPRESS_PLUGIN_DIR . 'admin/class-saaspress-configurations.php';
+        SaasPress_Configurations::render_page();
     }
 
-    public function create_tenants_page() {
-        include_once plugin_dir_path( __FILE__ ) . 'class-saaspress-tenants.php';
+    public static function render_tenants_page() {
+        require_once SAASPRESS_PLUGIN_DIR . 'admin/class-saaspress-tenants.php';
+        SaasPress_Tenants::render_page();
     }
 
-    public function create_configurations_page() {
-        include_once plugin_dir_path( __FILE__ ) . 'class-saaspress-configurations.php';
+    public static function render_about_page() {
+        require_once SAASPRESS_PLUGIN_DIR . 'admin/class-saaspress-about.php';
+        SaasPress_About::render_page();
     }
 }
-
-new SaasPress_Admin();
