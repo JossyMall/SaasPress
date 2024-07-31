@@ -1,41 +1,45 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: SaasPress\n"
-"POT-Creation-Date: 2024-07-01 12:00+0000\n"
-"PO-Revision-Date: 2024-07-01 12:00+0000\n"
-"Last-Translator: Angel Cee\n"
-"Language-Team: English\n"
+"Project-Id-Version: SaasPress 1.0\n"
+"POT-Creation-Date: 2024-07-30 12:00+0000\n"
+"PO-Revision-Date: 2024-07-30 12:00+0000\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin/class-saaspress-about.php:25
-msgid "About SaasPress"
-msgstr "About SaasPress"
+msgid "SaasPress"
+msgstr "SaasPress"
 
-#: admin/class-saaspress-configurations.php:35
 msgid "Configurations"
 msgstr "Configurations"
 
-#: admin/class-saaspress-tenants.php:40
 msgid "Tenants"
 msgstr "Tenants"
 
-#: admin/class-saaspress-settings.php:45
-msgid "Settings"
-msgstr "Settings"
+msgid "About Us"
+msgstr "About Us"
 
-#: admin/class-saaspress-settings.php:50
-msgid "Save Changes"
-msgstr "Save Changes"
-
-#: includes/class-saaspress.php:55
 msgid "Global Filters"
 msgstr "Global Filters"
 
-#: includes/class-saaspress-tenant-manager.php:60
-msgid "Add Tenant"
-msgstr "Add Tenant"
+msgid "Database Settings"
+msgstr "Database Settings"
 
+msgid "Select Tables to Duplicate"
+msgstr "Select Tables to Duplicate"
+
+msgid "Database Credentials"
+msgstr "Database Credentials"
+
+msgid "Make User a Tenant"
+msgstr "Make User a Tenant"
+
+msgid "Please select at least one user."
+msgstr "Please select at least one user."
+
+msgid "Failed to make selected users tenants."
+msgstr "Failed to make selected users tenants."
+
+msgid "Users have been made tenants."
+msgstr "Users have been made tenants."
