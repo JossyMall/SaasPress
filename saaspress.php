@@ -1,44 +1,30 @@
 <?php
 /**
  * Plugin Name: SaasPress
- * Description: A multi-tenant management plugin for WordPress.
- * Version: 0.1.0
+ * Plugin URI: https://tabs101.com/saaspress
+ * Description: A SaaS plugin for WordPress with multi-tenant architecture.
+ * Version: 1.0.0
  * Author: Angel Cee
  * Text Domain: saaspress
  * Domain Path: /languages
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly.
+if (!defined('ABSPATH')) {
+    exit;
 }
 
-// Includes
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-saaspress.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-saaspress-tenant-manager.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-saaspress-db.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-saaspress-utils.php';
+define('SAASPRESS_VERSION', '1.0.0');
+define('SAASPRESS_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('SAASPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-// Activation and deactivation hooks
-register_activation_hook( __FILE__, 'saaspress_activate' );
-register_deactivation_hook( __FILE__, 'saaspress_deactivate' );
+require_once SAASPRESS_PLUGIN_DIR . 'includes/class-saaspress.php';
 
-function saaspress_activate() {
-    // Activation code here
+register_activation_hook(__FILE__, ['SaasPress', 'activate']);
+register_deactivation_hook(__FILE__, ['SaasPress', 'deactivate']);
+register_uninstall_hook(__FILE__, 'saaspress_uninstall');
+
+function saaspress_uninstall() {
+    SaasPress::uninstall();
 }
 
-function saaspress_deactivate() {
-    // Deactivation code here
-}
-
-// Initialize the plugin
-add_action( 'plugins_loaded', 'saaspress_init' );
-
-function saaspress_init() {
-    $tenant_manager = new SaasPress_Tenant_Manager();
-    $saaspress = new SaasPress( $tenant_manager );
-
-    if ( is_admin() ) {
-        require_once plugin_dir_path( __FILE__ ) . 'admin/class-saaspress-admin.php';
-        $admin = new SaasPress_Admin();
-    }
-}
+SaasPress::init();
