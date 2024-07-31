@@ -1,22 +1,23 @@
-/* General Admin Styles for SaasPress */
+/* Basic styles for SaasPress admin pages */
 .wrap h1 {
-    font-size: 24px;
+    font-size: 2em;
     margin-bottom: 20px;
 }
 
 .wrap table {
     width: 100%;
-    border-collapse: collapse;
     margin-bottom: 20px;
 }
 
-.wrap table th, .wrap table td {
-    padding: 10px;
-    border: 1px solid #ddd;
-}
-
-.wrap table th {
-    background-color: #f9f9f9;
+.wrap th {
     text-align: left;
 }
 
+.wrap td {
+    padding: 10px;
+}
+
+#saaspress-user-select {
+    width: 100%;
+    height: 200px;
+}
