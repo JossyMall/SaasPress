@@ -1,23 +1,26 @@
-document.getElementById('make-tenant-button').addEventListener('click', function() {
-    const userSelect = document.getElementById('user-select');
-    const selectedUsers = Array.from(userSelect.selectedOptions).map(option => option.value);
-    const selectedTables = Array.from(document.querySelectorAll('input[name="tables[]"]:checked')).map(input => input.value);
+jQuery(document).ready(function($) {
+    $('#saaspress-make-tenant').on('submit', function(e) {
+        e.preventDefault();
 
-    if (selectedUsers.length === 0 || selectedTables.length === 0) {
-        alert('Please select at least one user and one table.');
-        return;
-    }
+        var selectedUsers = $('#saaspress-user-select').val();
+        if (selectedUsers.length === 0) {
+            alert('Please select at least one user.');
+            return;
+        }
 
-    const data = {
-        action: 'make_tenant',
-        users: selectedUsers,
-        tables: selectedTables,
-        nonce: saaspressAdmin.nonce
-    };
+        var data = {
+            action: 'saaspress_make_tenant',
+            users: selectedUsers,
+            security: saaspress_make_tenant_nonce
+        };
 
-    jQuery.post(saaspressAdmin.ajaxurl, data, function(response) {
-        alert(response.data);
-        location.reload();
+        $.post(ajaxurl, data, function(response) {
+            if (response.success) {
+                alert('Selected users have been made tenants.');
+                location.reload();
+            } else {
+                alert('Failed to make selected users tenants.');
+            }
+        });
     });
 });
-
