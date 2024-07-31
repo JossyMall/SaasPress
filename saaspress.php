@@ -3,7 +3,7 @@
  * Plugin Name: SaasPress
  * Plugin URI: https://tabs101.com/saaspress
  * Description: A SaaS plugin for WordPress with multi-tenant architecture.
- * Version: 1.0.0
+ * Version: 0.2 (Beta)
  * Author: Angel Cee
  * Text Domain: saaspress
  * Domain Path: /languages
