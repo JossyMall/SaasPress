@@ -1,3 +1,6 @@
+# SaasPress Beta (0.2)
+* Several bug fixes
+# Note! This plugin is not ready for production. Use with caution!!
 # SaasPress Beta (0.1)
 Full-featured multi-tenancy for wordpress, turn any wordpress installation and plugin into a Saas product
 This software is still in the early phase of development. Your contributions will be appreciated.
