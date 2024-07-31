@@ -1,40 +1,19 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; //```php
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly.
+if (!defined('ABSPATH')) {
+    exit;
 }
 
 class SaasPress_About {
-
-    public function __construct() {
-        add_action( 'admin_menu', array( $this, 'add_menu_page' ) );
-    }
-
-    public function add_menu_page() {
-        add_submenu_page(
-            'saaspress',
-            'About SaasPress',
-            'About Us',
-            'manage_options',
-            'saaspress-about',
-            array( $this, 'display_about_page' )
-        );
-    }
-
-    public function display_about_page() {
+    public static function render_page() {
         ?>
         <div class="wrap">
-            <h1>About SaasPress</h1>
-            <p>SaasPress is a multi-tenant management plugin for WordPress. It allows you to manage multiple tenants within a single WordPress installation, providing each tenant with their own set of tables and data.</p>
-            <p>Version: 1.0.0</p>
-            <p>Author: Angel Cee</p>
+            <h1><?php _e('About SaasPress', 'saaspress'); ?></h1>
+            <p><?php _e('SaasPress is a WordPress plugin designed to provide multi-tenant SaaS functionality.', 'saaspress'); ?></p>
+            <p><?php _e('Developed by Angel Cee.', 'saaspress'); ?></p>
+            <p><?php _e('For more information, visit ', 'saaspress'); ?><a href="https://tabs101.com/saaspress" target="_blank">https://tabs101.com/saaspress</a></p>
         </div>
         <?php
     }
 }
 
-if ( is_admin() ) {
-    new SaasPress_About();
-}
