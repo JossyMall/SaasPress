@@ -1,21 +1,54 @@
 <?php
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class SaasPress_DB {
-    public function duplicate_tables($prefix, $tables) {
-        global $wpdb;
+    private static $connections = [];
 
-        foreach ($tables as $table) {
-            $table_name = $wpdb->prefix . $table;
-            $new_table_name = $prefix . $table;
-
-            // Get the table structure
-            $create_table_sql = $wpdb->get_row("SHOW CREATE TABLE $table_name", ARRAY_N)[1];
-
-            // Modify the table name in the SQL
-            $create_table_sql = str_replace("CREATE TABLE `$table_name`", "CREATE TABLE `$new_table_name`", $create_table_sql);
-
-            // Create the new table
-            $wpdb->query($create_table_sql);
+    public static function get_connection($database) {
+        if (isset(self::$connections[$database])) {
+            return self::$connections[$database];
         }
+
+        $credentials = self::get_db_credentials($database);
+        if (!$credentials) {
+            return false;
+        }
+
+        $db_connection = new wpdb(
+            $credentials['username'],
+            $credentials['password'],
+            $credentials['database'],
+            $credentials['host']
+        );
+
+        if ($db_connection->has_errors()) {
+            return false;
+        }
+
+        self::$connections[$database] = $db_connection;
+        return $db_connection;
+    }
+
+    private static function get_db_credentials($database) {
+        $databases = get_option('saaspress_database_settings', []);
+        foreach ($databases as $db) {
+            if ($db['database'] === $database) {
+                return $db;
+            }
+        }
+        return false;
+    }
+
+    public static function switch_to_database($database) {
+        global $wpdb;
+        $db_connection = self::get_connection($database);
+        if ($db_connection) {
+            $wpdb = $db_connection;
+            return true;
+        }
+        return false;
     }
 }
-?>
