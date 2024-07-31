@@ -1,28 +1,49 @@
 <?php
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class SaasPress {
-    private $tenant_manager;
-
-    public function __construct($tenant_manager) {
-        $this->tenant_manager = $tenant_manager;
-
-        add_filter('query', [$this, 'filter_query']);
+    public static function init() {
+        add_action('plugins_loaded', [__CLASS__, 'load_textdomain']);
+        add_action('admin_menu', ['SaasPress_Admin', 'init']);
+        add_action('wp_ajax_saaspress_make_tenant', ['SaasPress_Tenant_Manager', 'make_tenant']);
     }
 
-    public function filter_query($query) {
+    public static function load_textdomain() {
+        load_plugin_textdomain('saaspress', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    }
+
+    public static function activate() {
+        self::create_tables();
+    }
+
+    public static function deactivate() {
+        // Clean up if necessary
+    }
+
+    public static function uninstall() {
         global $wpdb;
-        $current_user = wp_get_current_user();
+        $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}saaspress_tenants");
+    }
 
-        if ($this->tenant_manager->is_tenant($current_user->ID)) {
-            $tenant_prefix = $this->tenant_manager->get_tenant_prefix($current_user->ID);
+    private static function create_tables() {
+        global $wpdb;
+        $charset_collate = $wpdb->get_charset_collate();
 
-            $tables = $this->tenant_manager->get_global_filtered_tables();
-            foreach ($tables as $table) {
-                $base_table = $wpdb->prefix . $table;
-                $tenant_table = $tenant_prefix . $table;
-                $query = str_replace($base_table, $tenant_table, $query);
-            }
-        }
+        $table_name = $wpdb->prefix . 'saaspress_tenants';
+        $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            user_id bigint(20) NOT NULL,
+            user_login varchar(60) NOT NULL,
+            user_email varchar(100) NOT NULL,
+            database varchar(100) NOT NULL,
+            table_prefix varchar(100) NOT NULL,
+            PRIMARY KEY  (id)
+        ) $charset_collate;";
 
-        return $query;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
     }
 }
