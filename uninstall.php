@@ -1,22 +1,21 @@
 <?php
-/**
- * Uninstall SaasPress
- *
- * Deletes all plugin data upon uninstall.
- */
-
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-    exit; // Exit if accessed directly.
+// Exit if accessed directly.
+if (!defined('WP_UNINSTALL_PLUGIN')) {
+    exit;
 }
 
-// Cleanup options
-delete_option( 'saaspress_global_filters' );
-delete_option( 'saaspress_databases' );
-delete_option( 'saaspress_tenant_limit_per_db' );
-
-// Cleanup user meta
+// Clean up database and options.
 global $wpdb;
-$wpdb->query( "DELETE FROM $wpdb->usermeta WHERE meta_key = 'is_tenant'" );
-$wpdb->query( "DELETE FROM $wpdb->usermeta WHERE meta_key = 'tenant_prefix'" );
-$wpdb->query( "DELETE FROM $wpdb->usermeta WHERE meta_key = 'tenant_db_name'" );
 
+// Remove all tenant-specific tables.
+$prefixes = $wpdb->get_col("SELECT DISTINCT tenant_prefix FROM {$wpdb->prefix}tenants WHERE tenant_prefix IS NOT NULL");
+
+foreach ($prefixes as $prefix) {
+    $tables = $wpdb->get_col("SHOW TABLES LIKE '{$prefix}%'");
+    foreach ($tables as $table) {
+        $wpdb->query("DROP TABLE IF EXISTS $table");
+    }
+}
+
+// Remove tenant data.
+$wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}tenants");
